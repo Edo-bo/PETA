@@ -1,0 +1,217 @@
+<!doctype html>
+
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PETA UMPET — Hitungan 1 sampai 20</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg1: #0f172a;
+      --bg2: #1e293b;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.6);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Orbitron', sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(-45deg, var(--bg1), var(--bg2), #020617, var(--bg2));
+      background-size: 400% 400%;
+      animation: gradientMove 12s ease infinite;
+      color: var(--text);
+    }
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      padding: 28px;
+      border-radius: 16px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      width: 100%;
+      max-width: 720px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 26px;
+      margin-bottom: 8px;
+    }
+    p.lead {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+    .seconds {
+      font-size: 72px;
+      font-weight: 700;
+      color: var(--accent);
+      text-shadow: 0 0 15px var(--accent-glow);
+    }
+    .bubble {
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      box-shadow: inset 0 0 20px rgba(56, 189, 248, 0.3);
+    }
+    .progress {
+      height: 14px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 16px;
+    }
+    .bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), #0ea5e9);
+      box-shadow: 0 0 12px var(--accent-glow);
+      transition: width 0.3s ease;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-family: 'Orbitron', sans-serif;
+      transition: all 0.2s ease;
+    }
+    button.primary {
+      background: var(--accent);
+      color: #0f172a;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+    button.primary:hover {
+      background: #0ea5e9;
+    }
+    button.small {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+    }
+    button.small:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    .footer {
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>PETA UMPET</h1>
+    <p class="lead">Hitungan dari <strong>1</strong> sampai <strong>20</strong> dengan suara hitungan. Gunakan tombol untuk mengontrol.</p><div class="bubble">
+  <div class="seconds" id="seconds">—</div>
+  <div style="font-size:13px;color:var(--muted);margin-top:6px">Detik</div>
+</div>
+
+<div class="progress">
+  <div class="bar" id="bar"></div>
+</div>
+
+<div class="controls">
+  <button id="start" class="primary">Mulai</button>
+  <button id="stop" class="small">Stop</button>
+  <button id="restart" class="small">Ulang</button>
+  <button id="audioBtn" class="small">Audio Detik</button>
+  <button id="mute" class="small">Mute</button>
+</div>
+
+<div class="footer">
+  <div>File audio: <code>audio/audiopet.mp3</code></div>
+  <div><label for="voiceToggle">Gunakan suara</label> <input id="voiceToggle" type="checkbox" checked></div>
+</div>
+
+<audio id="voice" src="audio/audiopet.mp3" preload="auto"></audio>
+
+  </main>  <script>
+    const TOTAL = 20;
+    const secondsEl = document.getElementById('seconds');
+    const barEl = document.getElementById('bar');
+    const startBtn = document.getElementById('start');
+    const stopBtn = document.getElementById('stop');
+    const restartBtn = document.getElementById('restart');
+    const audioBtn = document.getElementById('audioBtn');
+    const muteBtn = document.getElementById('mute');
+    const voiceToggle = document.getElementById('voiceToggle');
+    const voice = document.getElementById('voice');
+
+    let interval = null;
+    let current = 0;
+    let isRunning = false;
+    let isMuted = false;
+
+    function updateUI() {
+      secondsEl.textContent = current === 0 ? '—' : current;
+      barEl.style.width = (current / TOTAL) * 100 + '%';
+    }
+
+    function tick() {
+      if (current >= TOTAL) { stop(); return; }
+      current++;
+      updateUI();
+      if (voiceToggle.checked && !isMuted) {
+        voice.currentTime = Math.max(0, current - 1);
+        voice.play().catch(()=>{});
+      }
+    }
+
+    function start() {
+      if (isRunning) return;
+      isRunning = true;
+      if (current === 0 && voiceToggle.checked && !isMuted) {
+        voice.currentTime = 0;
+        voice.play().catch(()=>{});
+      }
+      interval = setInterval(tick, 1000);
+      startBtn.disabled = true;
+    }
+
+    function stop() {
+      isRunning = false;
+      clearInterval(interval);
+      startBtn.disabled = false;
+      voice.pause();
+    }
+
+    function restart() {
+      stop();
+      current = 0;
+      updateUI();
+      if (voiceToggle.checked && !isMuted) {
+        voice.currentTime = 0;
+        voice.play().catch(()=>{});
+      }
+    }
+
+    startBtn.addEventListener('click', start);
+    stopBtn.addEventListener('click', stop);
+    restartBtn.addEventListener('click', restart);
+    audioBtn.addEventListener('click', () => { if (!isMuted) { voice.currentTime = 0; voice.play().catch(()=>{}); } });
+    muteBtn.addEventListener('click', () => { isMuted = !isMuted; muteBtn.textContent = isMuted ? 'Unmute' : 'Mute'; if (isMuted) voice.pause(); });
+
+    updateUI();
+  </script></body>
+</html>
