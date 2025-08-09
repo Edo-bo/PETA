@@ -34,100 +34,117 @@
       100% { background-position: 0% 50%; }
     }
     .card {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.04);
       backdrop-filter: blur(12px);
       padding: 28px;
       border-radius: 16px;
       box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       width: 100%;
-      max-width: 720px;
+      max-width: 820px;
       text-align: center;
     }
     h1 {
-      font-size: 26px;
-      margin-bottom: 8px;
+      font-size: 28px;
+      margin-bottom: 6px;
+      letter-spacing: 1px;
     }
     p.lead {
       font-size: 14px;
       color: var(--muted);
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
     .seconds {
-      font-size: 72px;
+      font-size: 84px;
       font-weight: 700;
       color: var(--accent);
-      text-shadow: 0 0 15px var(--accent-glow);
+      text-shadow: 0 0 20px var(--accent-glow), 0 6px 18px rgba(0,0,0,0.6);
+      line-height: 0.9;
     }
     .bubble {
-      padding: 20px;
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 12px;
-      box-shadow: inset 0 0 20px rgba(56, 189, 248, 0.3);
+      padding: 24px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius: 14px;
+      box-shadow: inset 0 4px 30px rgba(56, 189, 248, 0.04);
+      display: inline-block;
+      min-width: 220px;
     }
     .progress {
       height: 14px;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.06);
       border-radius: 10px;
       overflow: hidden;
-      margin-top: 16px;
+      margin: 18px auto 0;
+      width: calc(100% - 120px);
+      max-width: 560px;
     }
     .bar {
       height: 100%;
       width: 0%;
       background: linear-gradient(90deg, var(--accent), #0ea5e9);
-      box-shadow: 0 0 12px var(--accent-glow);
-      transition: width 0.3s ease;
+      box-shadow: 0 0 18px var(--accent-glow);
+      transition: width 0.25s linear;
     }
     .controls {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
       justify-content: center;
-      margin-top: 20px;
+      margin-top: 22px;
     }
     button {
-      padding: 10px 16px;
+      padding: 10px 18px;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
-      font-weight: 600;
+      font-weight: 700;
       font-family: 'Orbitron', sans-serif;
-      transition: all 0.2s ease;
+      transition: all 0.18s ease;
+      letter-spacing: 0.6px;
     }
     button.primary {
-      background: var(--accent);
-      color: #0f172a;
-      box-shadow: 0 0 12px var(--accent-glow);
+      background: linear-gradient(90deg, #22d3ee, #06b6d4);
+      color: #02111a;
+      box-shadow: 0 6px 18px rgba(6, 182, 212, 0.18), 0 0 18px var(--accent-glow);
     }
-    button.primary:hover {
-      background: #0ea5e9;
-    }
+    button.primary:active { transform: translateY(1px) }
     button.small {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255,255,255,0.04);
       color: var(--text);
+      padding: 10px 14px;
+      border: 1px solid rgba(255,255,255,0.04);
     }
-    button.small:hover {
-      background: rgba(255, 255, 255, 0.2);
-    }
+    button.small:hover { transform: translateY(-3px); }
     .footer {
-      margin-top: 16px;
-      font-size: 12px;
+      margin-top: 18px;
+      font-size: 13px;
       color: var(--muted);
       display: flex;
       justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    code { background: rgba(0,0,0,0.25); padding:4px 6px; border-radius:6px; font-size:13px }
+    @media (max-width:720px) {
+      .seconds { font-size: 64px }
+      .progress { width: calc(100% - 40px); }
+      .card { padding: 20px }
+    }
+    @media (max-width:420px) {
+      .seconds { font-size: 48px }
+      .bubble { min-width: 160px }
     }
   </style>
 </head>
 <body>
-  <main class="card">
-    <h1>PETA UMPET</h1>
-    <p class="lead">Hitungan dari <strong>1</strong> sampai <strong>20</strong> dengan suara hitungan. Gunakan tombol untuk mengontrol.</p><div class="bubble">
+  <main class="card" role="main" aria-labelledby="title">
+    <h1 id="title">PETA UMPET</h1>
+    <p class="lead">Hitungan dari <strong>1</strong> sampai <strong>20</strong> dengan suara hitungan. Setelah selesai, akan ada suara tanda selesai. Pastikan file audio ada di folder <code>audio/</code>.</p><div class="bubble" role="status" aria-live="polite">
   <div class="seconds" id="seconds">—</div>
-  <div style="font-size:13px;color:var(--muted);margin-top:6px">Detik</div>
+  <div style="font-size:13px;color:var(--muted);margin-top:8px">Detik</div>
 </div>
 
-<div class="progress">
+<div class="progress" aria-hidden="true">
   <div class="bar" id="bar"></div>
 </div>
 
@@ -140,11 +157,13 @@
 </div>
 
 <div class="footer">
-  <div>File audio: <code>audio/audiopet.mp3</code></div>
-  <div><label for="voiceToggle">Gunakan suara</label> <input id="voiceToggle" type="checkbox" checked></div>
+  <div>File audio: <code>audio/audiopet.mp3</code> + <code>audio/selesai.mp3</code></div>
+  <div><label for="voiceToggle">Gunakan suara</label> <input id="voiceToggle" type="checkbox" checked aria-label="Toggle suara hitungan"></div>
 </div>
 
+<!-- Audio elements -->
 <audio id="voice" src="audio/audiopet.mp3" preload="auto"></audio>
+<audio id="doneAudio" src="audio/selesai.mp3" preload="auto"></audio>
 
   </main>  <script>
     const TOTAL = 20;
@@ -157,6 +176,7 @@
     const muteBtn = document.getElementById('mute');
     const voiceToggle = document.getElementById('voiceToggle');
     const voice = document.getElementById('voice');
+    const doneAudio = document.getElementById('doneAudio');
 
     let interval = null;
     let current = 0;
@@ -165,15 +185,34 @@
 
     function updateUI() {
       secondsEl.textContent = current === 0 ? '—' : current;
-      barEl.style.width = (current / TOTAL) * 100 + '%';
+      barEl.style.width = ((current / TOTAL) * 100) + '%';
+    }
+
+    function finish() {
+      // play selesai audio if allowed
+      if (!isMuted) {
+        try { doneAudio.currentTime = 0; doneAudio.play().catch(()=>{}); } catch(e){}
+      }
+      // visual cue (flash)
+      secondsEl.animate([
+        { transform: 'scale(1)' },
+        { transform: 'scale(1.06)' },
+        { transform: 'scale(1)' }
+      ], { duration: 600 });
     }
 
     function tick() {
-      if (current >= TOTAL) { stop(); return; }
-      current++;
+      if (current >= TOTAL) {
+        stop();
+        finish();
+        return;
+      }
+      current += 1;
       updateUI();
+
+      // Play counting audio (best if audiopet.mp3 matches timing or contains continuous narration)
       if (voiceToggle.checked && !isMuted) {
-        voice.currentTime = Math.max(0, current - 1);
+        try { voice.currentTime = Math.max(0, current - 1); } catch(e){}
         voice.play().catch(()=>{});
       }
     }
@@ -182,8 +221,7 @@
       if (isRunning) return;
       isRunning = true;
       if (current === 0 && voiceToggle.checked && !isMuted) {
-        voice.currentTime = 0;
-        voice.play().catch(()=>{});
+        try { voice.currentTime = 0; voice.play().catch(()=>{}); } catch(e){}
       }
       interval = setInterval(tick, 1000);
       startBtn.disabled = true;
@@ -192,26 +230,44 @@
     function stop() {
       isRunning = false;
       clearInterval(interval);
+      interval = null;
       startBtn.disabled = false;
-      voice.pause();
+      try { voice.pause(); } catch(e){}
     }
 
     function restart() {
       stop();
       current = 0;
       updateUI();
+      try { voice.currentTime = 0; doneAudio.currentTime = 0; } catch(e){}
       if (voiceToggle.checked && !isMuted) {
-        voice.currentTime = 0;
-        voice.play().catch(()=>{});
+        try { voice.play().catch(()=>{}); } catch(e){}
       }
     }
 
     startBtn.addEventListener('click', start);
     stopBtn.addEventListener('click', stop);
     restartBtn.addEventListener('click', restart);
-    audioBtn.addEventListener('click', () => { if (!isMuted) { voice.currentTime = 0; voice.play().catch(()=>{}); } });
-    muteBtn.addEventListener('click', () => { isMuted = !isMuted; muteBtn.textContent = isMuted ? 'Unmute' : 'Mute'; if (isMuted) voice.pause(); });
 
+    audioBtn.addEventListener('click', () => {
+      if (isMuted) return;
+      try { voice.currentTime = 0; voice.play().catch(()=>{}); } catch(e){}
+    });
+
+    muteBtn.addEventListener('click', () => {
+      isMuted = !isMuted;
+      muteBtn.textContent = isMuted ? 'Unmute' : 'Mute';
+      if (isMuted) {
+        try { voice.pause(); doneAudio.pause(); } catch(e){}
+      }
+    });
+
+    // Accessibility: space -> start/stop
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') { e.preventDefault(); if (!isRunning) start(); else stop(); }
+    });
+
+    // init UI
     updateUI();
   </script></body>
 </html>
